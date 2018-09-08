@@ -53,11 +53,11 @@ A typical data science project:
     library("tidyverse")
     ```
 
-## `mpg` data {.smaller}
+## `dat` data {.smaller}
 
-- `mpg` data is available from the `ggplot2` package:
+- `dat` data is available from the `ggplot2` package:
     ```{r}
-    mpg
+    dat
     ```
     
 - `displ`: engine size, in litres.  
