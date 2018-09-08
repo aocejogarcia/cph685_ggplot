@@ -60,8 +60,8 @@ A typical data science project:
     dat
     ```
     
-- `displ`: engine size, in litres.  
-    `hwy`: highway fuel efficiency, in mile per gallen (mpg).
+- `Digestive_rate`: engine size, in litres.  
+    `Age`: highway fuel efficiency, in mile per gallen (mpg).
 
 # Aesthetic mappings | r4ds chapter 3.3
     
