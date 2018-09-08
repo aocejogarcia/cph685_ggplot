@@ -1,6 +1,9 @@
 ---
 title: "Data Visualization With ggplot2"
-author: "Dr. Jin Zhou"
+author: 
+- "Dr. Jin Zhou" \newline
+- "Xin Tang" \newline
+- "Abraham Ocejo Garcia" 
 date: "Sep 10, 2018"
 output:
   ioslides_presentation: default
