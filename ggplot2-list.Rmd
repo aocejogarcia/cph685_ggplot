@@ -55,13 +55,18 @@ A typical data science project:
 
 ## `dat` data {.smaller}
 
-- `dat` data is available from the `ggplot2` package:
-    ```{r}
-    dat
-    ```
+```{r}
+library(plyr)
+dat=mpg
+colnames(dat)[3:11]=c("digestive_rate","year","cyl","trans","drv","population","age","fl","race")
+dat$race=mapvalues(dat$race, from = c("2seater", "compact","midsize","minivan","pickup","subcompact","suv"), to = c("American Indian", "Black","Latino","Native Hawaiian","Asian","Other Pacific Islander","White"))
+dat
+```
     
-- `Digestive_rate`: engine size, in litres.  
-    `Age`: highway fuel efficiency, in mile per gallen (mpg).
+- `digestive_rate` = displ: engine size, in litres.  
+  `age` = hwy : highway fuel efficiency, in mile per gallen (mpg).
+  `race` = class
+  `population` = cty
 
 # Aesthetic mappings | r4ds chapter 3.3
     
