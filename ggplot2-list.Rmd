@@ -68,80 +68,96 @@ dat
   `race` = class
   `population` = cty
 
+
 # Aesthetic mappings | r4ds chapter 3.3
-    
+
+## Aesthetic {.smaller}
+
+- Oxford Dictionary: Concerned with beauty or the appreciation of beauty.
+
+- In plots: text & symbols can be seen directly. Scales, color, size, shape...
+
+- One single dot may have a lot information 
+
+
 ## Scatter plot {.smaller}
 
-`hwy` vs `displ`
+- `Digestive rate`  vs  `Age` 
 ```{r} 
-ggplot(data = mpg) +
-geom_point(mapping = aes(x = displ, y = hwy))
+ggplot(data = dat) +
+geom_point(mapping = aes(x = age, y = digestive_rate))
 ```
 
-Check available aesthetics for a geometric object by `?geom_point`. 
+- Check available aesthetics for a geometric object by `?geom_point`. 
 
 ## Color of points {.smaller} 
 
-- Color points according to `class`:
+- Color points according to `race`:
 ```{r}
-ggplot(data = mpg) +
-geom_point(mapping = aes(x = displ, y = hwy, color = class))
+ggplot(data = dat) +
+geom_point(mapping = aes(x = age, y = digestive_rate, color = race))
 ```
 
 ## Size of points {.smaller}
 
-- Assign different sizes to points according to `class`:
+- Color points according to `race`;
+- Assign different sizes to points according to `population`:
 ```{r, warning = FALSE}
-ggplot(data = mpg) +
-geom_point(mapping = aes(x = displ, y = hwy, size = class))
+ggplot(data = dat) +
+geom_point(mapping = aes(x = age, y = digestive_rate, color = race,size=population)) +
+theme(legend.key.size = unit(0.35, "cm"))  
 ```
 
 ## Transparency of points {.smaller}
 
-- Assign different transparency levels to points according to `class`:
+- Assign different transparency levels to points according to `year`:
 ```{r}
-ggplot(data = mpg) +
-geom_point(mapping = aes(x = displ, y = hwy, alpha = class))
+ggplot(data = dat) +
+geom_point(mapping = aes(x = age, y = digestive_rate, alpha = year))
 ```
 
 ## Shape of points {.smaller}
 
-- Assign different shapes to points according to `class`:
+- Assign different shapes to points according to `race`
+  (without `scale_shape_manual` statement, only 6 shapes will be shown):
 ```{r, warning = FALSE}
-ggplot(data = mpg) +
-geom_point(mapping = aes(x = displ, y = hwy, shape = class))
+ggplot(data = dat) +
+geom_point(mapping = aes(x = age, y = digestive_rate, shape = race))+
+  scale_shape_manual(values=1:7)
 ```
 
-- Maximum of 6 shapes at a time. By default, additional groups will go unplotted.
 
 ## Manual setting of an aesthetic {.smaller}
 
-- Set the color of all points to be blue:
+- The options in `aes` statement doesn't have to be a variable. 
+  Set the color of all points to be blue:
 ```{r}
-ggplot(data = mpg) + 
-geom_point(mapping = aes(x = displ, y = hwy), color = "blue")
+ggplot(data = dat) + 
+geom_point(mapping = aes(x = age, y = digestive_rate), color = "blue")
 ```
+
 
 # Facets | r4ds chapter 3.5
 
 ## Facets {.smaller}
 
-- Facets divide a plot into subplots based on the values of one or more discrete variables.
+- Facets divide a plot into subplots based on one or more categorical variables.
+  Application: Subgroup analysis, Annual fluctuation...
 
-- A subplot for each car type:
+- A subplot for each year:
 ```{r}
-ggplot(data = mpg) +
-geom_point(mapping = aes(x = displ, y = hwy)) +
-facet_wrap(~ class, nrow = 2)
+ggplot(data = dat) +
+geom_point(mapping = aes(x = age, y = digestive_rate)) +
+facet_wrap(~ year, nrow = 2)
 ```
 
- ---
+##
 
-- A subplot for each car type and drive:
+- A subplot for each racial group and year:
 ```{r}
-ggplot(data = mpg) +
-geom_point(mapping = aes(x = displ, y = hwy)) + 
-facet_grid(drv ~ class)
+ggplot(data = dat[dat$race==c("Black","White","Asian"),]) +
+geom_point(mapping = aes(x = age, y = digestive_rate)) + 
+facet_grid(year ~ race )
 ```
     
 # Geometric objects | r4ds chapter 3.6
@@ -306,101 +322,58 @@ geom_bar(mapping = aes(x = cut, fill = clarity), position = "stack")
 ```
 
 
+
 # Coordinate systems | r4ds chapter 3.9
 
-----
+## A boxplot {.smaller}
 
-- A boxplot:
+- Try: 
+* coord_fixed(ratio = 1/2)
+* coord_cartesian(xlim = c(0, 5))
+* coord_flip()
 ```{r}
-ggplot(data = mpg, mapping = aes(x = class, y = hwy)) +
-geom_boxplot()
+ggplot(data = dat, aes(x = factor(year), y = age)) +
+geom_boxplot() 
+```
+     
+
+## A map {.smaller}
+```{r, message=F, warning=F}
+library(maps)
 ```
 
-----
-
-- `coord_cartesian()` is the default cartesian coordinate system:
 ```{r}
-ggplot(data = mpg, mapping = aes(x = class, y = hwy)) +
-geom_boxplot() +
-coord_cartesian(xlim = c(0, 5))
-```
-
-----
-
-- `coord_fixed()` specifies aspect ratio:
-```{r}
-ggplot(data = mpg, mapping = aes(x = class, y = hwy)) +
-geom_boxplot() +
-coord_fixed(ratio = 1/2)
-```
-
-----
-
-- `coord_flip()` flips x- and y- axis:
-```{r}
-ggplot(data = mpg, mapping = aes(x = class, y = hwy)) +
-geom_boxplot() +
-coord_flip()
-```
-
-----
-
-- A map:
-```{r}
-
-library("maps")
 nz <- map_data("nz")
-
 ggplot(nz, aes(long, lat, group = group)) +
 geom_polygon(fill = "white", colour = "black")
 ```
 
-----
+
+##
 
 - `coord_quickmap()` puts maps in scale:
 ```{r}
 ggplot(nz, aes(long, lat, group = group)) +
 geom_polygon(fill = "white", colour = "black") +
-coord_quickmap()
+coord_quickmap() 
 ```
 
-# Graphics for communications | r4ds chapter 28
+    
+# Graphics for communications | r4ds chapter 28 
 
-## Title {.smaller}
+## Text Information {.smaller}
 
-- Figure title should be descriptive:
+- Figure title should be descriptive
+- Add lables for x and y axis 
+- Use subtitle and caption to provide more info 
 ```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
-ggplot(mpg, aes(x = displ, y = hwy)) +
-geom_point(aes(color = class)) +
+ggplot(dat, aes(x = age, y = digestive_rate)) +
+geom_point(aes(color = race)) +
 geom_smooth(se = FALSE) +
-labs(title = "Fuel efficiency generally decreases with engine size")
-```
-
-## Subtitle and caption {.smaller}
-
--
-```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
-ggplot(mpg, aes(displ, hwy)) +
-geom_point(aes(color = class)) +
-geom_smooth(se = FALSE) +
-labs(
-title = "Fuel efficiency generally decreases with engine size",
-subtitle = "Two seaters (sports cars) are an exception because of their light weight",
-caption = "Data from fueleconomy.gov"
-)
-```
-
-## Axis labels {.smaller}
-
--
-```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
-ggplot(mpg, aes(displ, hwy)) +
-geom_point(aes(colour = class)) +
-geom_smooth(se = FALSE) +
-labs(
-x = "Engine displacement (L)",
-y = "Highway fuel economy (mpg)"
-)
+labs( x = "Age (y)",y = "Digestive Rate",title = "Digestive rate decreases with age",
+     subtitle = "Total sample size = 234",
+caption = "Derived from the mpg data from fueleconomy.gov")+
+  theme(plot.caption  = element_text(hjust=0.2))
 ```
 
 ## Math equations {.smaller}
@@ -415,99 +388,138 @@ y = quote(alpha + beta + frac(delta, theta))
 )
 ```
 
-- `?plotmath`
+
 
 ## Annotations {.smaller}
 
 - Create labels
 ```{r}
-best_in_class <- mpg %>%
-group_by(class) %>%
-filter(row_number(desc(hwy)) == 1)
-best_in_class
+oldest_in_race <- dat %>%
+group_by(race) %>%
+filter(row_number(desc(age)) == 1)
+oldest_in_race
 ```
 
----
+##
 
 - Annotate points
 ```{r}
-ggplot(mpg, aes(x = displ, y = hwy)) +
-geom_point(aes(colour = class)) +
-geom_text(aes(label = model), data = best_in_class)
+ggplot(dat, aes(x = age, y = digestive_rate)) +
+geom_point(aes(colour = race)) +
+geom_text(aes(label = year), data = oldest_in_race)
+## add 'hjust=0.4,nudge_y = 1,size = 2.3' to geom_text statement
 ```
 
-----
+##
+
+```{r,echo=FALSE}
+library("ggrepel")
+```
 
 - `ggrepel` package automatically adjust labels so that they don’t overlap:
 ```{r, fig.width = 4.5, fig.height = 3}
-library("ggrepel")
-ggplot(mpg, aes(displ, hwy)) +
-geom_point(aes(colour = class)) +
-geom_point(size = 3, shape = 1, data = best_in_class) +
-ggrepel::geom_label_repel(aes(label = model), data = best_in_class)
+ggplot(dat, aes(x = age, y = digestive_rate)) +
+geom_point(aes(colour = race)) +
+geom_point(size = 3, shape = 1, data = oldest_in_race) +
+ggrepel::geom_label_repel(aes(label = year), data = oldest_in_race)
 ```
 
 ## Scales
 
--
+- automatically adds scales
 ```{r, eval = FALSE}
-ggplot(mpg, aes(displ, hwy)) +
-geom_point(aes(colour = class))
-```
- automatically adds scales
-```{r, eval = FALSE}
-ggplot(mpg, aes(displ, hwy)) +
-geom_point(aes(colour = class)) +
+ggplot(dat, aes(x = age, y = digestive_rate)) +
+geom_point(aes(colour = race)) +
 scale_x_continuous() +
 scale_y_continuous() +
 scale_colour_discrete()
 ```
 
-----
+##
 
-- `breaks`
+- `breaks` and `labels`
 ```{r}
-ggplot(mpg, aes(displ, hwy)) +
+ggplot(dat, aes(x = age, y = digestive_rate)) +
 geom_point() +
-scale_y_continuous(breaks = seq(15, 40, by = 5))
+scale_y_continuous(breaks = seq(0, 10, by = 2),
+labels=c("","cut1","cut2","cut3","cut4","cut5"))
 ```
 
-----
+- Want to see 'cut5'? Add 'yend=10' to aes statement
 
-- `labels`
-```{r}
-ggplot(mpg, aes(displ, hwy)) +
-geom_point() +
-scale_x_continuous(labels = NULL) +
-scale_y_continuous(labels = NULL)
-```
-
-----
+##
 
 - Plot y-axis at log scale:
 ```{r}
-ggplot(mpg, aes(x = displ, y = hwy)) +
+ggplot(dat, aes(x = age, y = digestive_rate)) +
 geom_point() +
-scale_y_log10()
+scale_y_log10(breaks = c(0,3,6,9)) 
 ```
 
-----
+##
 
 - Plot x-axis in reverse order:
 ```{r}
-ggplot(mpg, aes(x = displ, y = hwy)) +
+ggplot(dat, aes(x = age, y = digestive_rate)) +
 geom_point() +
 scale_x_reverse()
 ```
 
 
-## Legends
+## Zooming
 
-- Set legend position: `"left"`, `"right"`, `"top"`, `"bottom"`, `none`:
-```{r, collapse = TRUE}
-ggplot(mpg, aes(displ, hwy)) +
-geom_point(aes(colour = class)) +
-theme(legend.position = "left")
+- Without clipping (removes unseen data points)
+```{r, message = FALSE}
+ggplot(dat, aes(x = age, y = digestive_rate)) +
+geom_point(aes(color = race)) +
+coord_cartesian(ylim = c(0, 7), xlim = c(10, 20))
+```
+- Or with clipping: use `+xlim(10, 50) + ylim(0, 7)` 
+
+
+##
+
+
+- Set ranges of the axis in ggplot code
+```{r, message = FALSE, warning = FALSE}
+ggplot(dat, aes(x = age, y = digestive_rate)) +
+geom_point(aes(color = race)) +
+geom_smooth() +
+scale_y_continuous(limits = c(0, 7)) +
+scale_x_continuous(limits = c(20, 30))
+```
+
+##
+
+- Modify the data (restrict the ranges) before plotting 
+```{r, message = FALSE,eval=FALSE}
+dat %>%
+filter(digestive_rate >= 0, digestive_rate <= 7, age >= 20, age <= 30) 
+%>% ggplot(aes(x = age, y = digestive_rate)) +
+geom_point(aes(color = race)) +
+geom_smooth()
+```
+
+# Themes |  'theme' almost controls every component of the plot except aesthetic  
+
+## Change background {.smaller}
+```{r, message = FALSE}
+ggplot(dat, aes(x = age, y = digestive_rate)) +
+geom_point(aes(color = race)) +
+geom_smooth(se = FALSE) + 
+  theme_dark() 
+```
+
+
+## Change legend {.smaller}
+
+- 'legend' can be complicated: position, background, size, font...
+
+```{r}
+ggplot(dat, aes(x = age, y = digestive_rate)) +
+geom_point(aes(colour = race)) +
+theme(legend.position = "bottom",legend.direction = "horizontal",
+legend.key.size = unit(1, 'lines'))
 ```
 
 ----
@@ -517,67 +529,18 @@ theme(legend.position = "left")
 <http://www.sthda.com/english/wiki/ggplot2-legend-easy-steps-to-change-the-position-and-the-appearance-of-a-graph-legend-in-r-software>
 
 
-## Zooming
-
-- Without clipping (removes unseen data points)
-```{r, message = FALSE}
-ggplot(mpg, mapping = aes(displ, hwy)) +
-geom_point(aes(color = class)) +
-geom_smooth() +
-coord_cartesian(xlim = c(5, 7), ylim = c(10, 30))
-```
-
-----
-
-- With clipping (removes unseen data points)
-```{r, message = FALSE, warning = FALSE}
-ggplot(mpg, mapping = aes(displ, hwy)) +
-geom_point(aes(color = class)) +
-geom_smooth() +
-xlim(5, 7) + ylim(10, 30)
-```
-
-----
-
--
-```{r, message = FALSE, warning = FALSE}
-ggplot(mpg, mapping = aes(displ, hwy)) +
-geom_point(aes(color = class)) +
-geom_smooth() +
-scale_x_continuous(limits = c(5, 7)) +
-scale_y_continuous(limits = c(10, 30))
-```
-
-----
-
--
-```{r, message = FALSE}
-mpg %>%
-filter(displ >= 5, displ <= 7, hwy >= 10, hwy <= 30) %>%
-ggplot(aes(displ, hwy)) +
-geom_point(aes(color = class)) +
-geom_smooth()
-```
-
-## Themes
-
--
-```{r, message = FALSE}
-ggplot(mpg, aes(displ, hwy)) +
-geom_point(aes(color = class)) +
-geom_smooth(se = FALSE) +
-theme_bw()
-```
-
-----
-
-<p align="center">
-<img src="./visualization-themes.png" height="550">
-</p>
 
 ## Saving plots
 
 ```{r, collapse = TRUE}
-ggplot(mpg, aes(displ, hwy)) + geom_point()
+ggplot(dat, aes(x = age, y = digestive_rate)) + geom_point()
 ggsave("my-plot.pdf")
 ```
+
+## 
+
+- Keep the cheat sheet at hand and Google code frame of the plot you want
+- Find advanced plots & code: https://www.r-graph-gallery.com/
+<p align="left">
+<img src="./End.png" height="275">
+</p>
