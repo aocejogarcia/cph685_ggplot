@@ -55,19 +55,19 @@ A typical data science project:
 
 ## `dat` data {.smaller}
 
-```{r}
+```{r, warning=FALSE, echo=FALSE}
 library(plyr)
 dat=mpg
-colnames(dat)[3:11]=c("digestive_rate","year","cyl","trans","drv","population","age","fl","race")
+colnames(dat)[3:11]=c("digestive_rate","year","cyl","trans","state","population","age","fl","race")
 dat$race=mapvalues(dat$race, from = c("2seater", "compact","midsize","minivan","pickup","subcompact","suv"), to = c("American Indian", "Black","Latino","Native Hawaiian","Asian","Other Pacific Islander","White"))
+dat$state=mapvalues(dat$state, from = c("4", "f","r"), to = c("Arizona", "California","Texas"))
+```
+```{r, eval=FALSE}
 dat
 ```
-    
-- `digestive_rate` = displ: engine size, in litres.  
-  `age` = hwy : highway fuel efficiency, in mile per gallen (mpg).
-  `race` = class
-  `population` = cty
-
+```{r, echo=FALSE}
+dat[1:5,]
+```
 
 # Aesthetic mappings | r4ds chapter 3.3
 
@@ -164,42 +164,43 @@ facet_grid(year ~ race )
 
 ## `geom_smooth()`: smooth line
 
-- `hwy` vs `displ` line:
+- `age` vs `digestive_rate` line:
 ```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
-ggplot(data = mpg) +
-geom_smooth(mapping = aes(x = displ, y = hwy))
+ggplot(data = dat) +
+geom_smooth(mapping = aes(x = age, y = digestive_rate))
 ```
 
 ## Different line types
 
-- Different line types according to `drv`:
-```{r, fig.width = 4.5, fig.height = 3, , message = FALSE}
-ggplot(data = mpg) +
-geom_smooth(mapping = aes(x = displ, y = hwy, linetype = drv))
+- Different line types according to `race`:
+```{r, fig.width = 4.5, fig.height = 3, , message = FALSE, warning=FALSE}
+ggplot(data = dat[dat$race==c("Black", "White", "Asian"),]) +
+geom_smooth(mapping = aes(x = age, y = digestive_rate, 
+                          linetype = race))
 ```
 
 ## Different line colors
 
-- Different line colors according to `drv`:
-```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
-ggplot(data = mpg) +
-geom_smooth(mapping = aes(x = displ, y = hwy, color = drv))
+- Different line colors according to `race`:
+```{r, fig.width = 4.5, fig.height = 3, message = FALSE, warning=FALSE}
+ggplot(data = dat[dat$race==c("Black", "White", "Asian"),]) +
+geom_smooth(mapping = aes(x = age, y = digestive_rate, color = race))
 ```
 
 ## Points and lines
 
 - Lines overlaid over scatter plot:
 ```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
-ggplot(data = mpg) +
-geom_point(mapping = aes(x = displ, y = hwy)) +
-geom_smooth(mapping = aes(x = displ, y = hwy))
+ggplot(data = dat) +
+geom_point(mapping = aes(x = age, y = digestive_rate)) +
+geom_smooth(mapping = aes(x = age, y = digestive_rate))
 ```
 
 ----
 
 - Same as
 ```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
-ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
+ggplot(data = dat, mapping = aes(x = age, y = digestive_rate)) +
 geom_point() + geom_smooth()
 ```
 
@@ -207,26 +208,26 @@ geom_point() + geom_smooth()
 
 - Different aesthetics in different layers:
 ```{r, fig.width = 4.5, fig.height = 3, message = FALSE}
-ggplot(data = mpg, mapping = aes(x = displ, y = hwy)) +
-geom_point(mapping = aes(color = class)) +
-geom_smooth(data = filter(mpg, class == "subcompact"), se = FALSE)
+ggplot(data = dat, mapping = aes(x = age, y = digestive_rate)) +
+geom_point(mapping = aes(color = race)) +
+geom_smooth(data = filter(dat, race == "White"), se = FALSE)
 ```
-    
+
 # Bar charts | r4ds chapter 3.7
 
-## `diamonds` data {.smaller}
+## `dat` data {.smaller}
 
-- `diamonds` data:
+- `dat` data:
 ```{r}
-diamonds
+dat
 ```
 
 ## Bar chart
 
 - `geom_bar()` creates bar chart:
 ```{r}
-ggplot(data = diamonds) +
-geom_bar(mapping = aes(x = cut))
+ggplot(data = dat) +
+geom_bar(mapping = aes(x = race))
 ```
 
 ----
@@ -242,8 +243,8 @@ geom_bar(mapping = aes(x = cut))
 
 - Use `stat_count()` directly:
 ```{r}
-ggplot(data = diamonds) +
-stat_count(mapping = aes(x = cut))
+ggplot(data = dat) +
+stat_count(mapping = aes(x = race))
 ```
 - `stat_count()` has a default geom `geom_bar()`.
 
@@ -251,32 +252,32 @@ stat_count(mapping = aes(x = cut))
 
 - Display frequency instead of counts:
 ```{r}
-ggplot(data = diamonds) +
-geom_bar(mapping = aes(x = cut, y = ..prop.., group = 1))
+ggplot(data = dat) +
+geom_bar(mapping = aes(x = race, y = ..prop.., group = 1))
 ```
 
 ----
 
 - Color bar:
 ```{r, results = 'hold'}
-ggplot(data = diamonds) +
-geom_bar(mapping = aes(x = cut, colour = cut))
+ggplot(data = dat) +
+geom_bar(mapping = aes(x = race, colour = race))
 ```
 
 ----
 
 - Fill color:
 ```{r, results = 'hold'}
-ggplot(data = diamonds) +
-geom_bar(mapping = aes(x = cut, fill = cut))
+ggplot(data = dat) +
+geom_bar(mapping = aes(x = race, fill = race))
 ```
 
 ----
 
 - Fill color according to another variable:
 ```{r}
-ggplot(data = diamonds) +
-geom_bar(mapping = aes(x = cut, fill = clarity))
+ggplot(data = dat) +
+geom_bar(mapping = aes(x = race, fill = state))
 ```
 
 # Positional arguments | r4ds chapter 3.8
@@ -285,43 +286,42 @@ geom_bar(mapping = aes(x = cut, fill = clarity))
 
 - `position_gitter()` add random noise to X and Y position of each element to avoid overplotting:
 ```{r}
-ggplot(data = mpg) +
-geom_point(mapping = aes(x = displ, y = hwy), position = "jitter")
+ggplot(data = dat) +
+geom_point(mapping = aes(x = age, y = digestive_rate), 
+           position = "jitter")
 ```
 
 ----
 
 - `geom_jitter()` is similar:
 ```{r}
-ggplot(data = mpg) +
-geom_jitter(mapping = aes(x = displ, y = hwy))
+ggplot(data = dat) +
+geom_jitter(mapping = aes(x = age, y = digestive_rate))
 ```
 
 ----
 
 - `position_fill()` stack elements on top of one another, normalize height:
 ```{r}
-ggplot(data = diamonds) +
-geom_bar(mapping = aes(x = cut, fill = clarity), position = "fill")
+ggplot(data = dat) +
+geom_bar(mapping = aes(x = race, fill = state), position = "fill")
 ```
 
 ----
 
 - `position_dodge()` arrange elements side by side:
 ```{r}
-ggplot(data = diamonds) +
-geom_bar(mapping = aes(x = cut, fill = clarity), position = "dodge")
+ggplot(data = dat) +
+geom_bar(mapping = aes(x = race, fill = state), position = "dodge")
 ```
 
 ----
 
 - `position_stack()` stack elements on top of each other: 
 ```{r}
-ggplot(data = diamonds) +
-geom_bar(mapping = aes(x = cut, fill = clarity), position = "stack")
+ggplot(data = dat) +
+geom_bar(mapping = aes(x = race, fill = state), position = "stack")
 ```
-
-
 
 # Coordinate systems | r4ds chapter 3.9
 
